@@ -1,0 +1,63 @@
+{% extends "farmerweb/base.html" %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h2 class="text-light">Welcome, {{ user.username }}</h2>
+    <h1 class="text-light fw-bold">Easy Farming</h1>
+    <p class="text-light lead">Empowering farmers with real-time weather updates, crop management insights, and advanced farming techniques.</p>
+</div>
+
+<!-- Features Section -->
+<section class="container mt-5">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card bg-dark text-light p-4 rounded">
+                <h3>🌦️ Weather Updates</h3>
+                <p>Get real-time weather updates and daily SMS alerts to make informed farming decisions.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-light p-4 rounded">
+                <h3>🌾 Crop Management</h3>
+                <p>Learn best practices for sowing, watering, and harvesting your crops efficiently.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-light p-4 rounded">
+                <h3>🦠 Disease Control</h3>
+                <p>Identify and control crop diseases with expert guidance and preventive measures.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Additional Features -->
+<section class="container mt-5">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card bg-dark text-light p-4 rounded">
+                <h3>🌱 Plantation Tips</h3>
+                <p>Optimize your planting techniques for better yield and soil conservation.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-light p-4 rounded">
+                <h3>💡 Fertilizer Guidance</h3>
+                <p>Get recommendations for the best fertilizers based on your soil and crops.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-light p-4 rounded">
+                <h3>🛒 Farmer Marketplace</h3>
+                <p>Sell and buy agricultural products through our dedicated seller platform.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<div class="container text-center mt-5 mb-5">
+    <h3 class="text-light">Join us in revolutionizing agriculture with technology!</h3>
+    <a href="{% url 'farmerweb:accountpage' %}" class="btn btn-success mt-3">Get Started</a>
+</div>
+{% endblock content %}
