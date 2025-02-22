@@ -49,7 +49,7 @@ Install dependencies: bash pip install -r requirements.txt
 Navigate to source bash cd source
 
 Start the Application
-Run the Django application: bash Django run
+Run the Django application:python manage.py runserver
 
 Open your browser and navigate to:
 
