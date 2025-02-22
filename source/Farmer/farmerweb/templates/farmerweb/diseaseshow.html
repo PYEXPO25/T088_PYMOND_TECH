@@ -1,0 +1,38 @@
+{% extends "farmerweb/base.html" %}
+{% block content %}
+<div class="container my-4">
+    <h1 class="text-center text-light">Disease Details</h1>
+
+    <div class="row align-items-center text-light">
+        <!-- Image Section -->
+        <div class="col-12 col-md-6 text-center order-1 order-md-1">
+            {% for disease in diseases %}
+                <img class="img-fluid disease-image rounded mb-3" src="{{ disease.image1.url }}" alt="Disease Image">
+            {% endfor %}
+        </div>
+
+        <!-- Text Content Section -->
+        <div class="col-12 col-md-6 order-2 order-md-2">
+            {% for disease in diseases %}
+                <h2 class="fw-bold text-warning">{{ disease.diseasename }}</h2>
+                <p><strong>Type:</strong> {{ disease.diseasetype }}</p>
+                <p><strong>Symptoms:</strong> {{ disease.symptoms }}</p>
+                <p><strong>Preventive Measures:</strong> {{ disease.preventivemeasures }}</p>
+                <p><strong>Caused By:</strong> {{ disease.causedby }}</p>
+                <p><strong>Stage:</strong> {{ disease.stage }}</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .disease-image {
+        max-width: 100%;
+        height: auto;
+        max-height: 400px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+</style>
+
+{% endblock content %}
