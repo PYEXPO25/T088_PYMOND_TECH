@@ -1,0 +1,103 @@
+{% extends "farmerweb/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center text-light mb-4">Account</h1>
+
+    <!-- User Info Card -->
+    <div class="card p-4 shadow-lg mb-4 bg-dark text-light">
+        <h3><strong>Name:</strong> {{ user.username }}</h3>
+        <h3><strong>Email:</strong> {{ user.email }}</h3>
+
+        {% if datas %}
+            {% for data in datas %}
+                <h3><strong>Phone:</strong> {{ data.phonenumber }}</h3>
+                <h3><strong>Location:</strong> {{ data.Location }}</h3>
+            {% endfor %}
+        {% else %}
+            <h3 class="text-warning"><strong>Phone:</strong> Not Updated</h3>
+            <h3 class="text-warning"><strong>Location:</strong> Not Updated</h3>
+        {% endif %}
+    </div>
+
+    <!-- Crops Section -->
+    <div class="card p-4 shadow-lg mb-4 bg-dark text-light">
+        <h3 class="text-primary mb-3">Your Crops</h3>
+        {% if crops %}
+            <div class="table-responsive">
+                <table class="table table-bordered text-center text-light">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Crop Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crop in crops %}
+                            <tr>
+                                <td>{{ crop.cropname }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <h4 class="text-danger">Currently, there are no crops. Please add...</h4>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addlocation">
+            Add Location
+        </button>
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#addphone">
+            Add Phone Number
+        </button>
+        <a href="{% url 'farmerweb:forgot-password' %}" class="btn btn-warning">
+            Reset Password
+        </a>
+    </div>
+</div>
+
+<!-- Add Location Modal -->
+<div class="modal fade" id="addlocation" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Add Location</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <label for="Location" class="form-label">Location:</label>
+                    <input type="text" name="Location" class="form-control" required>
+                    <br>
+                    <input type="submit" class="btn btn-success w-100" value="Submit">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Phone Modal -->
+<div class="modal fade" id="addphone" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Add Phone Number</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <label for="Phone" class="form-label">Phone:</label>
+                    <input type="text" name="Phone" class="form-control" required>
+                    <br>
+                    <input type="submit" class="btn btn-info w-100" value="Submit">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,68 @@
+{% extends "farmerweb/base.html" %}
+{% block content %}
+
+<div class="container my-4">
+    <h1 class="text-center text-light fw-bold">Fertilizers</h1>
+
+    {% if crops %}
+    <form method="post" class="mb-4 text-center">
+        {% csrf_token %}
+        <label for="Crop" class="form-label fw-bold text-warning">Choose a Crop To View Fertilizer:</label>
+        <select name="Crop" class="form-select d-inline-block w-auto mx-2">
+            {% for crop in crops %}
+            <option value="{{ crop.cropname }}">{{ crop.cropname }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    {% if fertilizers %}
+        <div class="row justify-content-center">
+            <!-- Fertilizer Name and Uses (Left Side) -->
+            <div class="col-lg-5">
+                <h2 class="fw-bold text-light">Fertilizer Name and Uses</h2>
+                {% for fertilizer in fertilizers %}
+                <div class="card shadow-sm border-0 mb-4 bg-dark text-light">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-primary">{{ fertilizer.fertilizername }}</h5>
+                        <p class="text-muted">{{ fertilizer.fertilizer | linebreaks }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- How To Use (Right Side) -->
+            <div class="col-lg-5">
+                <h2 class="fw-bold text-light">How To Use:</h2>
+                {% for fertilizer in fertilizers %}
+                <div class="card shadow-sm border-0 mb-3 bg-dark text-light">
+                    <div class="card-body">
+                        <p class="fw-semibold">{{ fertilizer.howtouse | linebreaks }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <h3 class="text-center text-warning">Choose A Crop</h3>
+    {% endif %}
+
+    {% else %}
+        <h3 class="text-center text-danger">No Crops Found</h3>
+    {% endif %}
+</div>
+
+<style>
+    body {
+        background-color: #0b132b; /* Dark blue background */
+    }
+    .card {
+        border-radius: 10px;
+        padding: 15px;
+    }
+    .form-label {
+        font-size: 1.2rem;
+    }
+</style>
+
+{% endblock content %}
