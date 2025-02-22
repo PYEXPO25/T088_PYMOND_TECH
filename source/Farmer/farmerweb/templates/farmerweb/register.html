@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle at center, #0f172a, #0b132b);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+        }
+        .register-container {
+            background: rgba(20, 25, 45, 0.9);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.3);
+            width: 350px;
+            text-align: center;
+        }
+        .register-container h2 {
+            margin-bottom: 20px;
+            color: #0099ff;
+            text-shadow: 0 0 10px rgba(0, 153, 255, 0.8);
+        }
+        .register-container input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            background: #1c2333;
+            color: white;
+            border-radius: 6px;
+            outline: none;
+        }
+        .register-container input::placeholder {
+            color: #adb5bd;
+        }
+        .register-container button {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .register-container button:hover {
+            background: #0056b3;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.8);
+        }
+        .login-link {
+            margin-top: 15px;
+        }
+        .login-link a {
+            color: #00ccff;
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-shadow: 0 0 15px rgba(0, 153, 255, 0.7);">Welcome Farmer</h1>
+    <h3 style="color: rgb(139, 193, 47); text-shadow: 0 0 10px rgba(139, 193, 47, 0.6);">
+        You Can Just Register Here By Your Details
+    </h3>
+    <div class="register-container">
+        <h2>Create Account</h2>
+        {% if messages %}
+            {% for message in messages %}
+                <center>
+                    <h4 style="color: {% if message.tags == 'error' %}firebrick{% else %}dodgerblue{% endif %};">
+                        {{ message }}
+                    </h4>
+                </center>
+            {% endfor %}
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" placeholder="Username" name="username" required>
+            <input type="email" placeholder="Email" name="email" required>
+            <input type="password" placeholder="Password" name="password" required>
+            <input type="password" placeholder="Confirm Password" name="confirm" required>
+            <button type="submit">Register</button>
+        </form>
+        <div class="login-link">
+            <p>Already have an account? <a href="{% url 'farmerweb:loginpage' %}">Login here</a></p>
+        </div>
+    </div>
+</body>
+</html>
