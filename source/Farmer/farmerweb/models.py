@@ -41,19 +41,43 @@ class fertilizerss(models.Model):
     howtouse=models.TextField()
     def __str__(self):
         return f"Fertilize added to {self.cropname}"
-class sellers(models.Model):
+class seller(models.Model):
+    farmername=models.CharField(max_length=20,default="Not Specified")
+    farmermobile=models.BigIntegerField(default=0)
+    farmerlocation=models.CharField(max_length=20,default="Not")
     cropname=models.CharField(max_length=20)
     quantity=models.IntegerField()
     price=models.IntegerField()
     experience=models.IntegerField()
     def __str__(self):
         return f"{self.cropname} added to sellers"
-class merchant(models.Model):
-    username=models.CharField(max_length=20)
-    password=models.TextField()
-    email=models.EmailField()
-    contact=models.BigIntegerField()
-    location=models.CharField(max_length=20)
-    def __str__(self):
-        return f"{self.username} added to merchant"
     
+class plantationtips(models.Model):
+    cropname=models.CharField(max_length=20)
+    choice=models.TextField()
+    climate=models.TextField()
+    soil=models.TextField()
+    seedpreparation=models.TextField()
+    plantingprocess=models.TextField()
+    fertilizer=models.TextField()
+    irrigation=models.TextField()
+    weed_and_pest_management=models.TextField()
+    harvestingandstorage=models.TextField()
+    expectedyield=models.TextField()
+    finaltips=models.TextField()
+    def __str__(self):
+        return f"{self.cropname} added to plantationtips"
+
+class schemes(models.Model):
+    schemename=models.CharField(max_length=100)
+    description=models.TextField()
+    def __str__(self):
+        return f"{self.schemename} added to schemes"
+
+class loan(models.Model):
+    reqdocs=models.TextField()
+    types=models.TextField()
+    benefits=models.TextField()
+    how_to_apply=models.TextField()
+    def __str__(self):
+        return f"Loan added to loan"

@@ -19,8 +19,11 @@ urlpatterns = [
     path('sellersite/',views.sellersite,name="sellerpage"),
     path('diseasecontrol/<str:diseasename>',views.diseaseshow,name="diseaseshowpage"),
     path('remove_crop/<int:crop_id>', views.remove_crop, name='remove_crop'),
-    #path('merchantlogin/',views.merchantlogin,name="merchantloginpage"),
-    #path('merchantregister/',views.merchantregister,name="merchantregisterpage"),
-    #path('merchantdashboard/',views.merchantdashboard,name="merchantdashboardpage"),
-    #path('merchantlogout/',views.merchant_logout,name="merchantlogout")
+    path('merchantlogin/',views.merchantlogin,name="merchantloginpage"),
+    path('merchantregister/',views.merchantregister,name="merchantregisterpage"),
+    path('merchantdashboard/',views.merchantdashboard,name="merchanthomepage"),
+    path('merchantaccount/',views.merchantaccount,name="merchantaccountpage"),
+    path('merchantlogout/',views.merchantlogout,name="merchantlogout"),
+    path('schemes/',views.scheme,name="schemes"),
+    path("loan/",views.loann,name="loans")
 ]

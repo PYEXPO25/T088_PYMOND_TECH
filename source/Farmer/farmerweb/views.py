@@ -20,7 +20,7 @@ def index(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        user = authenticate(request=request, username=username, password=password)
+        user = authenticate(request=request, username=username, password=password,first_name="farmer")
         if user is not None:
             login(request, user)
             return redirect(reverse("farmerweb:dashboardpage"))
@@ -38,6 +38,7 @@ def register(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password=request.POST.get('confirm')
+        firstname="farmer"
         user_data_has_error = False
         
         if User.objects.filter(username=username).exists():
@@ -59,7 +60,8 @@ def register(request):
             new_user = User.objects.create_user(
                 email = email,
                 username = username,
-                password = password
+                password = password,
+                first_name=firstname
             )
             messages.success(request, 'Account created. Login now')
             return redirect(reverse("farmerweb:loginpage"))
@@ -100,7 +102,6 @@ def diseasecontrol(request):
 
 @login_required
 def weatherupdate(request):
-    
         city = location.objects.filter(farmername_id=request.user)
         for data in city:
             city=data.Location
@@ -143,7 +144,15 @@ def weatherupdate(request):
         }
 
         return render(request, "farmerweb/weatherupdate.html", {"weather": weather_data, 'active_page': 'weather'})
+@login_required
+def plantation(request):
+    if request.method=="POST":
+        tips=plantationtips.objects.filter(cropname=request.POST.get('Crop'))
+        crops=Croplist.objects.filter(farmername_id=request.user)
+        return render(request,"farmerweb/plantationtips.html",{'active_page': 'plantation',"crops":crops,"tips":tips})
 
+    crops=Croplist.objects.filter(farmername_id=request.user)
+    return render(request,"farmerweb/plantationtips.html",{'active_page': 'plantation',"crops":crops})
 
 @login_required
 def account(request):
@@ -171,11 +180,6 @@ def account(request):
     return render(request,"farmerweb/account.html",{'active_page': 'account','crops':crops,'datas':data})
 
 @login_required
-def plantation(request):
-
-    return render(request,"farmerweb/plantation.html",{'active_page': 'plantation'})
-
-@login_required
 def fertilizers(request):
     if request.method=="POST":
         crop=request.POST.get('Crop')
@@ -189,13 +193,23 @@ def fertilizers(request):
 @login_required
 def sellersite(request):
     if request.method=="POST":
-        cropname=request.POST.get('crop')
-        quantity=request.POST.get('quantity')
-        price=request.POST.get('price')
-        experience=request.POST.get('experience')
-        add=sellers(cropname=cropname,quantity=quantity,price=price,experience=experience)
-        add.save()
-        messages.warning(request,f"The Crop {cropname} Is Added Successfully")
+        try:
+            farmername=request.user
+            detail=location.objects.filter(farmername_id=request.user)
+            farmerlocation=""
+            farmermobile=""
+            for m in detail:
+                farmerlocation=m.Location
+                farmermobile=m.phonenumber
+            cropname=request.POST.get('crop')
+            quantity=request.POST.get('quantity')
+            price=request.POST.get('price')
+            experience=request.POST.get('experience')
+            add=seller(cropname=cropname,quantity=quantity,price=price,experience=experience,farmername=farmername,farmermobile=farmermobile,farmerlocation=farmerlocation)
+            add.save()
+            messages.warning(request,f"The Crop {cropname} Is Added Successfully")
+        except:
+            messages.warning(request,f"Something Went Wrong")
     crops=Croplist.objects.filter(farmername_id=request.user)
     return render(request,"farmerweb/sellerpage.html",{'active_page': 'sellersite','crops':crops})
 
@@ -308,49 +322,92 @@ def remove_crop(request, crop_id):
     crop.delete()
     messages.success(request, f"{crop_name} has been removed successfully!")
     return redirect(reverse("farmerweb:cropmanagementpage"))  
-'''
+
 def merchantregister(request):
     if request.method == 'POST':
         username = request.POST.get('username')
-        password = request.POST.get('password')
         email = request.POST.get('email')
-        contact = request.POST.get('phone')
-        location = request.POST.get('location')
+        password = request.POST.get('password')
+        confirm_password=request.POST.get('confirm')
+        firstname="merchant"
         user_data_has_error = False
         
-        if merchant.objects.filter(username=username).exists():
+        if User.objects.filter(username=username).exists():
             user_data_has_error = True
             messages.error(request, 'Username already exists')
-        if merchant.objects.filter(email=email).exists():
+
+        if User.objects.filter(email=email).exists():
             user_data_has_error = True
             messages.error(request, 'Email already exists')
+
         if len(password) < 5:
             user_data_has_error = True
             messages.error(request, 'Password must be at least 5 characters')
+        if password!=confirm_password:
+            user_data_has_error = True
+            messages.error(request, 'Passwords Do Not Match')
+
         if not user_data_has_error:
-            new_user = merchant(username=username,email=email,contact=contact,location=location)
-            new_user.password=make_password(password)
-            new_user.save()
-            print(contact)
+            new_user = User.objects.create_user(
+                email = email,
+                username = username,
+                password = password,
+                first_name=firstname
+            )
             messages.success(request, 'Account created. Login now')
             return redirect(reverse("farmerweb:merchantloginpage"))
-        else:    
-            return redirect(reverse("farmerweb:merchantregisterpage"))  
+        else:
+            return redirect(reverse("farmerweb:merchantregisterpage"))
     return render(request,"farmerweb/merchantregister.html")
-username=""
+    
 def merchantlogin(request):
     if request.method == 'POST':
-        global username
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user=merchant.objects.filter(username=username,password=password)
+        user = authenticate(request=request, username=username, password=password,first_name="farmer")
         if user is not None:
-            username=username
-            return redirect(reverse("farmerweb:merchantdashboard"))
+            login(request,user)
+            return redirect(reverse("farmerweb:merchanthomepage"))
         else:
-            username=""
             messages.error(request, 'Invalid username or password')
-            return redirect(reverse("farmerweb:merchantlogin"))
+            return redirect(reverse("farmerweb:merchantloginpage"))
     return render(request,"farmerweb/merchantlogin.html")
 
-'''
+def merchantdashboard(request):
+    sale=seller.objects.all()
+    return render(request,"farmerweb/merchanthome.html",{'active_page': 'merchant_home','sales':sale})
+
+def merchantaccount(request):
+    if request.method=="POST":
+        if request.POST.get('Location'):
+            Location=request.POST.get('Location')
+            farmername=request.user
+            exist=location.objects.filter(farmername_id=request.user)
+            if not exist:
+                add=location(Location=Location,farmername=farmername)
+                add.save()
+            else:
+                exist=location.objects.filter(farmername_id=request.user).update(Location=Location)
+        if request.POST.get('Phone'):
+            Phone=request.POST.get('Phone')
+            farmername=request.user
+            exist=location.objects.filter(farmername_id=request.user)
+            if not exist:
+                add=location(phonenumber=Phone,farmername=farmername)
+                add.save()
+            else:
+                exist=location.objects.filter(farmername_id=request.user).update(phonenumber=Phone)
+    data=location.objects.filter(farmername_id=request.user)
+    return render(request,"farmerweb/merchantaccount.html",{'active_page': 'merchant_account','datas':data})
+
+def merchantlogout(request):
+    logout(request)
+    return redirect(reverse("farmerweb:merchantloginpage"))
+
+def scheme(request):
+    schemess=schemes.objects.all()
+    return render(request,"farmerweb/schemes.html",{'schemes':schemess})
+
+def loann(request):
+    loanss=loan.objects.all()
+    return render(request,"farmerweb/loans.html",{'loans':loanss})
