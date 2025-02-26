@@ -1,0 +1,24 @@
+{% extends "farmerweb/merchantdashboard.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-light text-center">Available Crops for Sale</h2>
+    <div class="row">
+        {% for sale in sales %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-body">
+                    <h5 class="card-title">{{ sale.cropname }} ({{ sale.quantity }} kg)</h5>
+                    <p class="card-text"><strong>Price:</strong> ₹{{ sale.price }} per kg</p>
+                    <p class="card-text"><strong>Farmer:</strong> {{ sale.farmername }}</p>
+                    <p class="card-text"><strong>Mobile:</strong> {{ sale.farmermobile }}</p>
+                    <p class="card-text"><strong>Location:</strong> {{ sale.farmerlocation }}</p>
+                    <p class="card-text"><strong>Experience:</strong> {{ sale.experience }} years</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-light">No sales available at the moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
