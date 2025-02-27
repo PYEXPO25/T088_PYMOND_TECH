@@ -79,6 +79,13 @@
 
     <div class="container">
         <h2>Merchant Login</h2>
+        {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %} text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
         <form method="POST">
             {% csrf_token %}
             <input type="text" name="username" placeholder="Username" required>

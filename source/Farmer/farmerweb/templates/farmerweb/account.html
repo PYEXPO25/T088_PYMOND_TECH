@@ -18,9 +18,26 @@
             <h3 class="text-warning"><strong>Location:</strong> Not Updated</h3>
         {% endif %}
     </div>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addlocation">
+            Add Location
+        </button>
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#addphone">
+            Add Phone Number
+        </button>
+        <a href="{% url 'farmerweb:forgot-password' %}" class="btn btn-warning">
+            Reset Password
+        </a>
+        <a href="{% url 'farmerweb:schemes' %}" class="btn btn-success">
+            Schemes
+        </a>
+        <a href="{% url 'farmerweb:loans' %}" class="btn btn-success">
+            Loan Details
+        </a>
+    </div>
 
     <!-- Crops Section -->
-    <div class="card p-4 shadow-lg mb-4 bg-dark text-light">
+    <div class="card p-4 shadow-lg mt-4 bg-dark text-light">
         <h3 class="text-primary mb-3">Your Crops</h3>
         {% if crops %}
             <div class="table-responsive">
@@ -43,36 +60,37 @@
             <h4 class="text-danger">Currently, there are no crops. Please add...</h4>
         {% endif %}
     </div>
-
-    <!-- Action Buttons -->
-    <div class="d-flex justify-content-center gap-3 flex-wrap">
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addlocation">
-            Add Location
-        </button>
-        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#addphone">
-            Add Phone Number
-        </button>
-        <a href="{% url 'farmerweb:forgot-password' %}" class="btn btn-warning">
-            Reset Password
-        </a>
-    </div>
 </div>
 
-<!-- Add Location Modal -->
+<!-- Add Location Modal with Leaflet Map -->
 <div class="modal fade" id="addlocation" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">Add Location</h5>
+                <h5 class="modal-title">Select Location</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
+                <p class="text-muted">Search for a location or click on the map to select.</p>
+
+                <!-- Map Container -->
+                <div id="map-container" style="width: 100%; height: 300px;">
+                    <div id="map" style="width: 100%; height: 100%;"></div>
+                </div>
+
                 <form method="post">
                     {% csrf_token %}
-                    <label for="Location" class="form-label">Location:</label>
-                    <input type="text" name="Location" class="form-control" required>
+                    <label class="form-label">Latitude:</label>
+                    <input type="text" id="latitude" name="latitude" class="form-control" readonly>
+
+                    <label class="form-label">Longitude:</label>
+                    <input type="text" id="longitude" name="longitude" class="form-control" readonly>
+
+                    <label class="form-label">Address:</label>
+                    <input type="text" id="address" name="address" class="form-control" readonly>
+
                     <br>
-                    <input type="submit" class="btn btn-success w-100" value="Submit">
+                    <button type="submit" class="btn btn-success w-100">Submit</button>
                 </form>
             </div>
         </div>
@@ -99,5 +117,74 @@
         </div>
     </div>
 </div>
+
+<!-- Leaflet Map Scripts -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script>
+    var map, marker;
+
+    function initializeMap() {
+        if (map) {
+            map.invalidateSize();
+            return;
+        }
+
+        map = L.map('map').setView([20.5937, 78.9629], 5); // Default India view
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add Search Box inside Map
+        L.Control.geocoder({
+            defaultMarkGeocode: false
+        })
+        .on('markgeocode', function(e) {
+            var latlng = e.geocode.center;
+            
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker(latlng).addTo(map);
+            document.getElementById('latitude').value = latlng.lat;
+            document.getElementById('longitude').value = latlng.lng;
+            document.getElementById('address').value = e.geocode.name;
+
+            map.setView(latlng, 12); // Zoom to location
+        })
+        .addTo(map);
+
+        // Click to select location
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lon = e.latlng.lng;
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker([lat, lon]).addTo(map);
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lon;
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('address').value = data.display_name || "Address not found";
+                })
+                .catch(error => {
+                    console.error("Error fetching address:", error);
+                    document.getElementById('address').value = "Error fetching address";
+                });
+        });
+    }
+
+    // Initialize map when modal opens
+    document.getElementById('addlocation').addEventListener('shown.bs.modal', initializeMap);
+</script>
 
 {% endblock content %}

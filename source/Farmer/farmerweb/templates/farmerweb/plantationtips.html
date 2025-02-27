@@ -1,0 +1,65 @@
+{% extends "farmerweb/base.html" %}
+{% block content %}
+
+<div class="container my-4">
+    <h1 class="text-center text-light fw-bold">Plantation Tips</h1>
+
+    {% if crops %}
+    <div class="text-center mt-4">
+        <h4 class="text-light fw-bold">Choose a Crop To View Plantation Tips:</h4>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            {% for crop in crops %}
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="Crop" value="{{ crop.cropname }}">
+                    <button type="submit" class="btn {% if selected_crop == crop.cropname %}btn-warning{% else %}btn-success{% endif %}">
+                        {{ crop.cropname }}
+                    </button>
+                </form>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if tips %}
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <h2 class="fw-bold text-light mt-4">Plantation Tips for {{ selected_crop }}</h2>
+                <div class="card shadow-sm border-0 mb-4 bg-dark text-light">
+                    <div class="card-body">
+                        {% for tip in tips %}
+                            <p><strong>Choice:</strong> {{ tip.choice | linebreaks }}</p>
+                            <p><strong>Climate:</strong> {{ tip.climate | linebreaks }}</p>
+                            <p><strong>Soil:</strong> {{ tip.soil | linebreaks }}</p>
+                            <p><strong>Seed Preparation:</strong> {{ tip.seedpreparation | linebreaks }}</p>
+                            <p><strong>Planting Process:</strong> {{ tip.plantingprocess | linebreaks }}</p>
+                            <p><strong>Fertilizer:</strong> {{ tip.fertilizer | linebreaks }}</p>
+                            <p><strong>Irrigation:</strong> {{ tip.irrigation | linebreaks }}</p>
+                            <p><strong>Weed & Pest Management:</strong> {{ tip.weed_and_pest_management | linebreaks }}</p>
+                            <p><strong>Harvesting & Storage:</strong> {{ tip.harvestingandstorage | linebreaks }}</p>
+                            <p><strong>Expected Yield:</strong> {{ tip.expectedyield | linebreaks }}</p>
+                            <p><strong>Final Tips:</strong> {{ tip.finaltips | linebreaks }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <h3 class="text-center text-warning mt-3">Choose A Crop</h3>
+    {% endif %}
+
+    {% else %}
+        <h3 class="text-center text-danger">No Crops Found</h3>
+    {% endif %}
+</div>
+
+<style>
+    body {
+        background-color: #0b132b;
+    }
+    .card {
+        border-radius: 10px;
+        padding: 15px;
+    }
+</style>
+
+{% endblock content %}

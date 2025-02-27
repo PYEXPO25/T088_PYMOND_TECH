@@ -17,7 +17,7 @@
             flex-direction: column;
             background: radial-gradient(circle, #0a0f24, #141c3a, #000000);
             position: relative;
-        } 
+        }
 
         /* Dynamic Animated Background */
         body::before {
@@ -63,10 +63,10 @@
                             <a class="nav-link {% if active_page == 'disease' %}active{% endif %}" href="{% url 'farmerweb:diseasepage' %}">Disease Control</a>
                         </li>
                         <li class="nav-item" style="margin-right: 20px;">
-                            <a class="nav-link {% if active_page == 'plantation' %}active{% endif %}" href="{% url 'farmerweb:plantationpage' %}">Plantation Tips</a>
+                            <a class="nav-link {% if active_page == 'fertilizers' %}active{% endif %}" href="{% url 'farmerweb:fertilizerspage' %}">Fertilizers</a>
                         </li>
                         <li class="nav-item" style="margin-right: 20px;">
-                            <a class="nav-link {% if active_page == 'fertilizers' %}active{% endif %}" href="{% url 'farmerweb:fertilizerspage' %}">Fertilizers</a>
+                            <a class="nav-link {% if active_page == 'plantation' %}active{% endif %}" href="{% url 'farmerweb:plantationpage' %}">Plantation Tips</a>
                         </li>
                         <li class="nav-item" style="margin-right: 20px;">
                             <a class="nav-link {% if active_page == 'account' %}active{% endif %}" href="{% url 'farmerweb:accountpage' %}">Account</a>

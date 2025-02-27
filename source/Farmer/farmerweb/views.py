@@ -83,12 +83,14 @@ def cropmanagement(request):
             if data.cropname==cropname:
                 messages.warning(request,f"The Crop {cropname} Already Exists")
                 crops=Croplist.objects.filter(farmername_id=request.user)
-                return render(request,"farmerweb/cropmanagement.html",{'active_page': 'cropmanagement',"crops":crops})
+                irrigationmanagement=irrigation.objects.all()
+                return render(request,"farmerweb/cropmanagement.html",{'active_page': 'cropmanagement',"crops":crops,"irrigationmanagement":irrigationmanagement})
         messages.warning(request,f"The Crop {cropname} Is Added Successfully")
         add=Croplist(cropname=cropname,farmername=farmername)
         add.save()
     crops=Croplist.objects.filter(farmername_id=request.user)
-    return render(request,"farmerweb/cropmanagement.html",{'active_page': 'cropmanagement',"crops":crops})
+    irrigationmanagement=irrigation.objects.all()
+    return render(request,"farmerweb/cropmanagement.html",{'active_page': 'cropmanagement',"crops":crops,"irrigationmanagement":irrigationmanagement})
 
 @login_required
 def diseasecontrol(request):
@@ -96,17 +98,19 @@ def diseasecontrol(request):
         cropname=request.POST.get('Crop')
         diseases=disease.objects.filter(cropname=cropname)
         crops=Croplist.objects.filter(farmername_id=request.user)
-        return render(request,"farmerweb/diseasecontrol.html",{'active_page': 'disease','crops':crops,'diseases':diseases})
+        return render(request,"farmerweb/diseasecontrol.html",{'active_page': 'disease','crops':crops,'diseases':diseases,"selected_crop":cropname})
     crops=Croplist.objects.filter(farmername_id=request.user)
     return render(request,"farmerweb/diseasecontrol.html",{'active_page': 'disease','crops':crops})
 
 @login_required
 def weatherupdate(request):
-        city = location.objects.filter(farmername_id=request.user)
-        for data in city:
-            city=data.Location
+        cityy = location.objects.filter(farmername_id=request.user).first()
+        latitude=cityy.latitude
+        longitude=cityy.longitude
+        city=cityy.Location
+        print(latitude,longitude)
         api_key = "a0f54834d5c91887ed11a16398ec0c5f"
-        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+        url = f"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid={api_key}&units=metric"
         response = requests.get(url).json()
 
         if response.get("cod") != 200:
@@ -115,25 +119,35 @@ def weatherupdate(request):
         # Extract Weather Data
         temperature = response["main"]["temp"]
         humidity = response["main"]["humidity"]
-        wind_speed = response["wind"]["speed"] * 3.6  # Convert from m/s to km/h
+        wind_speed = response["wind"]["speed"] * 3.6  
         cloud_cover = response["clouds"]["all"]
-        rain = response.get("rain", {}).get("1h", 0)  # Get rain amount in mm
+        rain = response.get("rain", {}).get("1h", 0)  
 
-        # **Irrigation Logic**
-        irrigation_schedule = "Normal irrigation required."
-        if temperature > 35 and humidity < 30:
-            irrigation_schedule = "Increase irrigation by 20% due to high temperature and low humidity."
-        elif temperature < 25 and humidity > 70:
-            irrigation_schedule = "Decrease irrigation by 30% as temperature is low and humidity is high."
-        elif wind_speed > 20:
-            irrigation_schedule = "Water early morning or late evening to avoid evaporation."
-        elif cloud_cover > 70:
-            irrigation_schedule = "Reduce irrigation by 20% as cloud cover is high."
+        soil_moisture = 50  # Default to 50% (you can replace with sensor data)
+
+    # Improved Irrigation Recommendation
+        if soil_moisture > 80:
+            irrigation_schedule = "No irrigation needed as soil is wet."
+        elif rain > 10:
+            irrigation_schedule = "Skip irrigation for today as heavy rain is expected."
         elif rain > 5:
-            irrigation_schedule = "Skip irrigation for today as rain is expected."
-
+            irrigation_schedule = "Reduce irrigation by 50% due to moderate rainfall."
+        elif cloud_cover > 80:
+            irrigation_schedule = "Reduce irrigation by 30% due to high cloud cover."
+        elif temperature > 38 and humidity < 30:
+            irrigation_schedule = "Increase irrigation by 30% due to extreme heat and dry conditions."
+        elif temperature > 30 and humidity < 50:
+            irrigation_schedule = "Increase irrigation by 15% due to warm weather."
+        elif temperature < 20 and humidity > 70:
+            irrigation_schedule = "Reduce irrigation by 40% due to low temperature and high humidity."
+        elif wind_speed > 25:
+            irrigation_schedule = "Water early morning or late evening to avoid evaporation loss."
+        elif soil_moisture < 30:
+            irrigation_schedule = "Increase irrigation as soil is too dry."
+        else:
+            irrigation_schedule = "Maintain normal irrigation schedule."
         weather_data = {
-            "city": response["name"],
+            "city": city,
             "temperature": temperature,
             "humidity": humidity,
             "wind_speed": wind_speed,
@@ -149,7 +163,7 @@ def plantation(request):
     if request.method=="POST":
         tips=plantationtips.objects.filter(cropname=request.POST.get('Crop'))
         crops=Croplist.objects.filter(farmername_id=request.user)
-        return render(request,"farmerweb/plantationtips.html",{'active_page': 'plantation',"crops":crops,"tips":tips})
+        return render(request,"farmerweb/plantationtips.html",{'active_page': 'plantation',"crops":crops,"tips":tips,"selected_crop":request.POST.get('Crop')})
 
     crops=Croplist.objects.filter(farmername_id=request.user)
     return render(request,"farmerweb/plantationtips.html",{'active_page': 'plantation',"crops":crops})
@@ -157,15 +171,17 @@ def plantation(request):
 @login_required
 def account(request):
     if request.method=="POST":
-        if request.POST.get('Location'):
-            Location=request.POST.get('Location')
+        if request.POST.get('address'):
+            Location=request.POST.get('address')
+            latitudee=request.POST.get('latitude')
+            longitudee=request.POST.get("longitude")
             farmername=request.user
             exist=location.objects.filter(farmername_id=request.user)
             if not exist:
-                add=location(Location=Location,farmername=farmername)
+                add=location(Location=Location,farmername=farmername,latitude=latitudee,longitude=longitudee)
                 add.save()
             else:
-                exist=location.objects.filter(farmername_id=request.user).update(Location=Location)
+                exist=location.objects.filter(farmername_id=request.user).update(Location=Location,latitude=latitudee,longitude=longitudee)
         if request.POST.get('Phone'):
             Phone=request.POST.get('Phone')
             farmername=request.user
@@ -185,7 +201,7 @@ def fertilizers(request):
         crop=request.POST.get('Crop')
         fertilizer=fertilizerss.objects.filter(cropname=crop)
         crops=Croplist.objects.filter(farmername_id=request.user)
-        return render(request,"farmerweb/fertilizers.html",{'active_page': 'fertilizers','crops':crops,"fertilizers":fertilizer})
+        return render(request,"farmerweb/fertilizers.html",{'active_page': 'fertilizers','crops':crops,"fertilizers":fertilizer,"selected_crop":crop})
     crops=Croplist.objects.filter(farmername_id=request.user)
     return render(request,"farmerweb/fertilizers.html",{'active_page': 'fertilizers','crops':crops})
 
@@ -211,7 +227,8 @@ def sellersite(request):
         except:
             messages.warning(request,f"Something Went Wrong")
     crops=Croplist.objects.filter(farmername_id=request.user)
-    return render(request,"farmerweb/sellerpage.html",{'active_page': 'sellersite','crops':crops})
+    sold=seller.objects.filter(farmername=request.user)
+    return render(request,"farmerweb/sellerpage.html",{'active_page': 'sellersite','crops':crops,"sold":sold})
 
 @login_required
 def user_logout(request):
@@ -411,3 +428,10 @@ def scheme(request):
 def loann(request):
     loanss=loan.objects.all()
     return render(request,"farmerweb/loans.html",{'loans':loanss})
+
+def delete_sold_crop(request, crop_id):
+    if request.method == "POST":
+        sold_crop = get_object_or_404(seller, id=crop_id)
+        sold_crop.delete()
+        messages.success(request, "Crop entry deleted successfully.")
+    return redirect(reverse("farmerweb:sellerpage")) 

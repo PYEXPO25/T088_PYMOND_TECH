@@ -25,5 +25,6 @@ urlpatterns = [
     path('merchantaccount/',views.merchantaccount,name="merchantaccountpage"),
     path('merchantlogout/',views.merchantlogout,name="merchantlogout"),
     path('schemes/',views.scheme,name="schemes"),
-    path("loan/",views.loann,name="loans")
+    path("loan/",views.loann,name="loans"),
+    path("delete_sold_crop/<int:crop_id>",views.delete_sold_crop,name="delete_sold_crop")
 ]

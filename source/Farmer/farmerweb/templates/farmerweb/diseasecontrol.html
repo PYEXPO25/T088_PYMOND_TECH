@@ -2,38 +2,40 @@
 {% block content %}
 
 <div class="container my-4">
-    <h1 class="text-center text-light">Pest and Disease Control</h1>
+    <h1 class="text-center text-light fw-bold">Pest and Disease Control</h1>
 
-    <!-- Crop Selection Form -->
     <div class="text-center mt-4">
-        <form method="post" class="d-inline-block">
-            {% csrf_token %}
-            <label for="Crop" class="form-label text-light fw-bold">Choose a Crop To View Disease:</label>
-            <select name="Crop" class="form-select w-auto d-inline-block">
-                {% for crop in crops %}
-                    <option value="{{ crop.cropname }}">{{ crop.cropname }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn btn-primary ms-2">Submit</button>
-        </form>
+        <h4 class="text-light fw-bold">Choose a Crop To View Disease:</h4>
+        {% if crops%}
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            {% for crop in crops %}
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="Crop" value="{{ crop.cropname }}">
+                    <button type="submit" 
+                        class="btn {% if selected_crop == crop.cropname %}btn-warning{% else %}btn-success{% endif %}">
+                        {{ crop.cropname }}
+                    </button>
+                </form>
+            {% endfor %}
+        </div>
+        {% else %}
+            <h3 style="color:red">Choose Your Crop in Crop Management Page</h3>
+        {% endif %}
     </div>
 
     {% if diseases %}
     <div class="row mt-4">
         {% for disease in diseases %}
         <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex align-items-stretch">
-            <!-- Clickable Card -->
             <a href="{% url 'farmerweb:diseaseshowpage' disease.diseasename %}" class="text-decoration-none w-100">
                 <div class="card shadow-sm p-3 clickable-card d-flex flex-column h-100 bg-dark text-light">
                     <h5 class="fw-bold text-success">{{ disease.diseasename }}</h5>
                     <p><strong>Type:</strong> {{ disease.diseasetype }}</p>
-
-                    <!-- Image Display -->
                     <div class="text-center">
                         <img class="img-fluid rounded disease-image" src="{{ disease.image1.url }}" alt="Disease Image">
                     </div>
-
-                    <div class="mt-auto"> <!-- Pushes content down -->
+                    <div class="mt-auto"> 
                         <p><strong>Symptoms:</strong> {{ disease.symptoms | truncatewords:10 }}</p>
                         <p><strong>Preventive Measures:</strong> {{ disease.preventivemeasures | truncatewords:10  }}</p>
                         <p><strong>Caused By:</strong> {{ disease.causedby | truncatewords:10  }}</p>
@@ -46,7 +48,7 @@
         {% endfor %}
     </div>
     {% else %}
-        <h2 class="text-center text-warning mt-4">No diseases found for the selected crop.</h2>
+        <h2 class="text-center text-warning mt-4">Choose A Crop</h2>
     {% endif %}
 </div>
 

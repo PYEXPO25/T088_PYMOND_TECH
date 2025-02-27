@@ -7,7 +7,7 @@
     {% if weather %}
     <div class="card shadow-lg border-0">
         <div class="card-header bg-dark text-white text-center">
-            <h3 class="fw-bold">{{ weather.city }}</h3>
+            <h3 class="fw-bold">{{ weather.city | truncatewords:5}}</h3>
         </div>
         <div class="card-body">
             <div class="row text-center">

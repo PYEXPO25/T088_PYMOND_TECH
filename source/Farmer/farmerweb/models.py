@@ -30,9 +30,11 @@ class disease(models.Model):
     def __str__(self):
         return f"Disease {self.diseasename} added to {self.cropname}"
 class location(models.Model):
-    Location=models.CharField(max_length=50)
+    Location=models.TextField()
     phonenumber=models.BigIntegerField(null=True)
     farmername=models.ForeignKey(User,on_delete=models.CASCADE)
+    latitude=models.CharField(max_length=255,default="Null")
+    longitude=models.CharField(max_length=255,default="Null")
     def __str__(self):
         return f"Location {self.Location}"
 class fertilizerss(models.Model):
@@ -44,7 +46,7 @@ class fertilizerss(models.Model):
 class seller(models.Model):
     farmername=models.CharField(max_length=20,default="Not Specified")
     farmermobile=models.BigIntegerField(default=0)
-    farmerlocation=models.CharField(max_length=20,default="Not")
+    farmerlocation=models.TextField()
     cropname=models.CharField(max_length=20)
     quantity=models.IntegerField()
     price=models.IntegerField()
@@ -81,3 +83,12 @@ class loan(models.Model):
     how_to_apply=models.TextField()
     def __str__(self):
         return f"Loan added to loan"
+    
+class irrigation(models.Model):
+    crop=models.CharField(max_length=100)
+    waterreq=models.CharField(max_length=100)
+    irrigation=models.CharField(max_length=100)
+    keygrowth=models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"Added Schedule for {self.crop}"

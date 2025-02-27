@@ -1,0 +1,26 @@
+{% extends "farmerweb/base.html" %}
+
+{% block content %}
+
+<style>
+    body {
+        color: white; /* Ensures high contrast text */
+    }
+    ol {
+        font-size: 1.2rem;
+        line-height: 1.6;
+    }
+    p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+</style>
+<h1 style="text-align:center;">Schemes</h1>
+<ol>
+{% for scheme in schemes %}
+<li>{{scheme.schemename | linebreaks}}</li>
+<p>{{scheme.description | linebreaks}}</p>
+
+{% endfor %}
+</ol>
+{% endblock content %}
